@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-09-25T15:10:41+10:00"
+    "timestamp": "2017-09-25T16:37:16+10:00"
   },
   "software": {
     "base": {
@@ -47,12 +47,47 @@
     },
     "actionators": [
       {
-        "name": "add_user",
-        "label": "Add User",
-        "return_type": "plain_text",
+        "name": "add_email_to_user",
+        "label": "Add Email Address to user",
+        "return_type": "json",
         "variables": [
           {
-            "name": "first_name",
+            "name": "email_address",
+            "input": {
+              "type": "string",
+              "label": "Email Address"
+            }
+          }
+        ]
+      },
+      {
+        "name": "add_user_to_group",
+        "label": "Add User to Group",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "uid",
+            "input": {
+              "type": "string",
+              "label": "User id"
+            }
+          },
+          {
+            "name": "group",
+            "input": {
+              "type": "string",
+              "label": "Group Name"
+            }
+          }
+        ]
+      },
+      {
+        "name": "add_user",
+        "label": "Add User",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "given_name",
             "mandatory": true,
             "input": {
               "type": "string",
@@ -68,10 +103,26 @@
             }
           },
           {
-            "name": "nitialsi",
+            "name": "middle_name",
             "input": {
               "type": "string",
-              "label": "Initials"
+              "label": "Middle name(s)"
+            }
+          },
+          {
+            "name": "password",
+            "mandatory": true,
+            "input": {
+              "type": "password_with_confirmation"
+            }
+          },
+          {
+            "name": "email_user",
+            "value": "true",
+            "mandatory": true,
+            "input": {
+              "type": "boolean",
+              "title": "Email Support"
             }
           }
         ],
@@ -79,6 +130,55 @@
           "language": "sh",
           "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparms_to_env\r\n"
         }
+      },
+      {
+        "name": "del_user",
+        "label": "Delete User",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "uid",
+            "mandatory": true,
+            "input": {
+              "type": "string",
+              "label": "User Name",
+              "comment": "first_initialLast_Name as in jdoe"
+            }
+          }
+        ]
+      },
+      {
+        "name": "list_group_members",
+        "label": "Groups Member",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "group_name",
+            "input": {
+              "type": "string",
+              "label": "Group Name"
+            }
+          }
+        ]
+      },
+      {
+        "name": "list_groups",
+        "label": "List Groups",
+        "return_type": "json"
+      },
+      {
+        "name": "list_user_email_adresses",
+        "label": "List Email address for user",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "uid",
+            "input": {
+              "type": "string",
+              "label": "User Name"
+            }
+          }
+        ]
       },
       {
         "name": "list_users",
@@ -90,17 +190,60 @@
         }
       },
       {
-        "name": "del_user",
-        "label": "Delete User",
-        "return_type": "plain_text",
+        "name": "mod_user",
+        "label": "Modify User",
+        "return_type": "json",
         "variables": [
           {
             "name": "uid",
             "mandatory": true,
             "input": {
               "type": "string",
-              "label": "User Name",
-              "comment": "first_initialLast_Name as in jdoe"
+              "title": "User Id"
+            }
+          }
+        ]
+      },
+      {
+        "name": "rm_email_address_from_user",
+        "label": "Remove email address from User",
+        "return_type": "none",
+        "variables": [
+          {
+            "name": "uid",
+            "mandatory": true,
+            "input": {
+              "type": "string",
+              "title": "User ID"
+            }
+          },
+          {
+            "name": "email_address",
+            "input": {
+              "type": "string",
+              "title": "Email Address"
+            }
+          }
+        ]
+      },
+      {
+        "name": "rm_user_from_group",
+        "label": "Remove User From Group",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "uid",
+            "mandatory": true,
+            "input": {
+              "type": "string",
+              "title": "User ID"
+            }
+          },
+          {
+            "name": "group_name",
+            "input": {
+              "type": "string",
+              "title": "Group Name"
             }
           }
         ]
@@ -115,20 +258,6 @@
             "input": {
               "type": "string",
               "label": "Username"
-            }
-          }
-        ]
-      },
-      {
-        "name": "add_email_to_user",
-        "label": "Add Email Address to user",
-        "return_type": "plain_text",
-        "variables": [
-          {
-            "name": "email_address",
-            "input": {
-              "type": "string",
-              "label": "Email Address"
             }
           }
         ]
