@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-09-25T14:47:28+10:00"
+    "timestamp": "2017-09-25T15:07:06+10:00"
   },
   "software": {
     "base": {
@@ -101,6 +101,20 @@
               "type": "string",
               "label": "User Name",
               "comment": "first_initialLast_Name as in jdoe"
+            }
+          }
+        ]
+      },
+      {
+        "name": "user_details",
+        "label": "User details",
+        "return_type": "none",
+        "variables": [
+          {
+            "name": "uid",
+            "input": {
+              "type": "string",
+              "label": "Username"
             }
           }
         ]
