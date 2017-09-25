@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-09-25T13:02:26+10:00"
+    "timestamp": "2017-09-25T14:47:28+10:00"
   },
   "software": {
     "base": {
@@ -88,6 +88,22 @@
           "language": "sh",
           "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparms_to_env\r\n\r\nldapsearch -b \"ou=People,dc=engines,dc=internal\" -h ldap objectClass=posixAccount"
         }
+      },
+      {
+        "name": "del_user",
+        "label": "Delete User",
+        "return_type": "plain_text",
+        "variables": [
+          {
+            "name": "uid",
+            "mandatory": true,
+            "input": {
+              "type": "string",
+              "label": "User Name",
+              "comment": "first_initialLast_Name as in jdoe"
+            }
+          }
+        ]
       }
     ]
   }
