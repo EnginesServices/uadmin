@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-09-25T12:26:23+10:00"
+    "timestamp": "2017-09-25T13:02:26+10:00"
   },
   "software": {
     "base": {
@@ -78,6 +78,15 @@
         "script": {
           "language": "sh",
           "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparms_to_env\r\n"
+        }
+      },
+      {
+        "name": "list_users",
+        "label": "List Users",
+        "return_type": "json",
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparms_to_env\r\n\r\nldapsearch -b \"ou=People,dc=engines,dc=internal\" -h ldap objectClass=posixAccount"
         }
       }
     ]
