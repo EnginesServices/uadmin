@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-09-25T15:07:06+10:00"
+    "timestamp": "2017-09-25T15:10:41+10:00"
   },
   "software": {
     "base": {
@@ -115,6 +115,20 @@
             "input": {
               "type": "string",
               "label": "Username"
+            }
+          }
+        ]
+      },
+      {
+        "name": "add_email_to_user",
+        "label": "Add Email Address to user",
+        "return_type": "plain_text",
+        "variables": [
+          {
+            "name": "email_address",
+            "input": {
+              "type": "string",
+              "label": "Email Address"
             }
           }
         ]
