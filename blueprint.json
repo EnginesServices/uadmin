@@ -15,8 +15,35 @@
         "level": "alpha",
         "patch": 0
       }
-    }
+    },
+    "software": {
+      "display": {
+        "title": "uadmin",
+        "label": "User Admin"
+      }
+    },
+    "timestamp": "2017-09-25T10:59:12+10:00"
   },
   "software": {
+    "base": {
+      "name": "uadmin",
+      "publisher_namespace": "EnginesSystem",
+      "type_path": "uadmin",
+      "service_handle_field": "na",
+      "parent_image": "engines/servicebase",
+      "run_as_user": "uadmin",
+      "deployment_type": "worker",
+      "memory": {
+        "required": 64,
+        "recommended": 64
+      },
+      "persistent": true
+    },
+    "scripts": {
+      "start": {
+        "language": "sh",
+        "content": "#!/bin/sh\r\n\r\nPID_FILE=/var/run/pid\r\nexport PID_FILE\r\n. /home/engines/functions/trap.sh\r\n\r\ntouch  /engines/var/run/flags/startup_complete\r\nc=1\r\n#while test $c -ne 0\r\n#do\r\nsleep 3600 &\r\necho $! > /var/run/pid\r\nwait\r\nexit_code=$?\r\n if test $SIGNAL -ne 1\r\n  then\r\n  \tc=0\r\n  fi\r\n#done\r\n\r\nrm /engines/var/run/flags/startup_complete\r\nexit $exit_code"
+      }
+    }
   }
 }
