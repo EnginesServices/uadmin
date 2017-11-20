@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-09-25T16:37:16+10:00"
+    "timestamp": "2017-11-20T14:41:49+11:00"
   },
   "software": {
     "base": {
@@ -53,9 +53,18 @@
         "variables": [
           {
             "name": "email_address",
+            "mandatory": true,
+            "input": {
+              "type": "email",
+              "label": "Email Address"
+            }
+          },
+          {
+            "name": "uid",
+            "mandatory": true,
             "input": {
               "type": "string",
-              "label": "Email Address"
+              "label": "User id"
             }
           }
         ]
@@ -67,6 +76,7 @@
         "variables": [
           {
             "name": "uid",
+            "mandatory": true,
             "input": {
               "type": "string",
               "label": "User id"
@@ -74,6 +84,7 @@
           },
           {
             "name": "group",
+            "mandatory": true,
             "input": {
               "type": "string",
               "label": "Group Name"
@@ -124,6 +135,14 @@
               "type": "boolean",
               "title": "Email Support"
             }
+          },
+          {
+            "name": "default_domain",
+            "value": "_Engines_System(default_domain)",
+            "input": {
+              "type": "string",
+              "label": "Primary email domain"
+            }
           }
         ],
         "script": {
@@ -154,6 +173,7 @@
         "variables": [
           {
             "name": "group_name",
+            "mandatory": true,
             "input": {
               "type": "string",
               "label": "Group Name"
@@ -173,9 +193,10 @@
         "variables": [
           {
             "name": "uid",
+            "mandatory": true,
             "input": {
               "type": "string",
-              "label": "User Name"
+              "label": "User id"
             }
           }
         ]
@@ -219,6 +240,7 @@
           },
           {
             "name": "email_address",
+            "mandatory": true,
             "input": {
               "type": "string",
               "title": "Email Address"
@@ -241,6 +263,7 @@
           },
           {
             "name": "group_name",
+            "mandatory": true,
             "input": {
               "type": "string",
               "title": "Group Name"
@@ -255,9 +278,204 @@
         "variables": [
           {
             "name": "uid",
+            "mandatory": true,
             "input": {
               "type": "string",
               "label": "Username"
+            }
+          }
+        ]
+      },
+      {
+        "name": "group_details",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "group_name",
+            "input": {
+              "type": "string",
+              "label": "Group name"
+            }
+          }
+        ]
+      },
+      {
+        "name": "user_group_membership",
+        "label": "User group membership",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "uid",
+            "mandatory": true,
+            "input": {
+              "type": "string",
+              "label": "User id"
+            }
+          }
+        ]
+      },
+      {
+        "name": "change_user_password",
+        "label": "Change password",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "uid",
+            "mandatory": true,
+            "input": {
+              "type": "string",
+              "label": "User id"
+            }
+          },
+          {
+            "name": "password",
+            "mandatory": true,
+            "input": {
+              "type": "password_with_confirmation",
+              "label": "New password"
+            }
+          },
+          {
+            "name": "current_password",
+            "input": {
+              "type": "password",
+              "label": "Current password"
+            }
+          }
+        ],
+        "script": {
+          "language": "sh"
+        }
+      },
+      {
+        "name": "list_email_groups",
+        "label": "List email groups",
+        "return_type": "json"
+      },
+      {
+        "name": "list_email_group_members",
+        "label": "List members of an email group",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "email_group",
+            "mandatory": true,
+            "input": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      {
+        "name": " create_email_group",
+        "label": "Create email group",
+        "return_type": "json",
+        "enable_logging": true,
+        "variables": [
+          {
+            "name": "email_group",
+            "mandatory": true,
+            "input": {
+              "type": "email",
+              "label": "Email group address"
+            }
+          },
+          {
+            "name": "description",
+            "mandatory": true,
+            "input": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      {
+        "name": "add_email_to_email_group",
+        "label": "Add email address to email group",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "email_group",
+            "mandatory": true,
+            "input": {
+              "type": "email",
+              "label": "Email group address"
+            }
+          },
+          {
+            "name": "email_address",
+            "input": {
+              "type": "email",
+              "label": "Email address"
+            }
+          }
+        ]
+      },
+      {
+        "name": "rm_email_group",
+        "label": "Remove email group",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "email_group",
+            "mandatory": true,
+            "input": {
+              "type": "email",
+              "label": "Email group address"
+            }
+          }
+        ]
+      },
+      {
+        "name": "rm_email_from_email_group",
+        "label": "Remove email from email group",
+        "return_type": "json",
+        "enable_logging": true,
+        "variables": [
+          {
+            "name": "email_group",
+            "mandatory": true,
+            "input": {
+              "type": "email",
+              "title": "Group email address"
+            }
+          },
+          {
+            "name": "email_address",
+            "mandatory": true,
+            "input": {
+              "type": "email",
+              "label": "Email address"
+            }
+          }
+        ]
+      },
+      {
+        "name": "all_user_names",
+        "label": "All user ids",
+        "return_type": "json"
+      },
+      {
+        "name": "all_email_adresses",
+        "label": "All email addresses",
+        "return_type": "json"
+      },
+      {
+        "name": "all_group_names",
+        "label": "List all group names",
+        "return_type": "json"
+      },
+      {
+        "name": "whose_email",
+        "label": "Who receives an email address",
+        "return_type": "json",
+        "variables": [
+          {
+            "name": "email_address",
+            "mandatory": true,
+            "input": {
+              "type": "email",
+              "label": "Email address"
             }
           }
         ]
