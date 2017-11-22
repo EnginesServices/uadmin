@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-11-22T14:02:44+11:00"
+    "timestamp": "2017-11-22T14:08:52+11:00"
   },
   "software": {
     "base": {
@@ -375,7 +375,7 @@
         ]
       },
       {
-        "name": " create_email_group",
+        "name": "create_email_group",
         "label": "Create email group",
         "return_type": "json",
         "enable_logging": true,
