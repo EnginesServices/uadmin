@@ -2,8 +2,8 @@
   "schema": {
     "type": "service_blueprint",
     "version": {
-      "major": 1,
-      "minor": 0
+      "major": 0,
+      "minor": 1
     },
     "origin": "Engines Developer Studio 0.2"
   },
@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-11-22T14:08:52+11:00"
+    "timestamp": "2017-12-04T18:45:32+11:00"
   },
   "software": {
     "base": {
@@ -31,12 +31,14 @@
       "type_path": "uadmin",
       "service_handle_field": "na",
       "parent_image": "engines/servicebase",
-      "run_as_user": "uadmin",
       "deployment_type": "worker",
       "memory": {
         "required": 64,
         "recommended": 64
       },
+      "run_as_user": "uadmin"
+    },
+    "disposition": {
       "persistent": true
     },
     "scripts": {
@@ -282,7 +284,7 @@
       {
         "name": "user_details",
         "label": "User details",
-        "return_type": "none",
+        "return_type": "json",
         "variables": [
           {
             "name": "uid",
