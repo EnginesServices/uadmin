@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-12-09T11:50:19+11:00"
+    "timestamp": "2017-12-18T10:28:19+11:00"
   },
   "software": {
     "base": {
@@ -52,6 +52,69 @@
         "path": "/home/engines/templates/add_user.ldif",
         "language": "text",
         "content": "dn: cn=$given_name $last_name,ou=People,dc=engines,dc=internal\r\ncn: $given_name $last_name\r\ngidnumber: 5000\r\ngivenname: $given_name\r\nhomedirectory: /home/users/$uid\r\nloginshell: /bin/sh\r\nmailacceptinggeneralid: $uid@${domain_name}\r\nmaildrop: $uid@${domain_name}\r\nobjectclass: postfixUser\r\nobjectclass: posixAccount\r\nobjectclass: inetOrgPerson\r\nobjectclass: top\r\nsn: $last_name\r\nuid: $uid\r\nuserpassword: {SASL}$uid@ENGINES.INTERNAL",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": " /home/engines/templates/add_email_group.ldif",
+        "content": "dn: cn=$email_group,ou=Distribution Groups,dc=engines,dc=internal\r\ncn: $email_group\r\ngidnumber: $gidNumber\r\ndescription: $description\r\nobjectclass: posixGroup\r\nobjectclass: top\r\n#NO BLANK LINES",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": " /home/engines/templates/add_email_to_email_group.ldif",
+        "content": "dn: cn=$email_group,ou=Distribution Groups,dc=engines,dc=internal\r\nchangetype: modify\r\nadd: memberUid\r\nmemberUid: $email_address",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": " /home/engines/templates/add_email_to_user.ldif ",
+        "content": "dn: $dn\r\nchangetype: modify\r\nadd: mailacceptinggeneralid\r\nmailacceptinggeneralid: $email_address",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": " /home/engines/templates/add_user_to_group.ldif ",
+        "content": "dn: cn=$group_name,ou=Groups,dc=engines,dc=internal\r\nchangetype: modify\r\nadd: memberUid\r\nmemberUid: $uid",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": " /home/engines/templates/del_user_email.ldif ",
+        "content": "dn: $dn\r\nchangetype: modify\r\ndelete:  mailacceptinggeneralid\r\nmailacceptinggeneralid: $email_address",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": " /home/engines/templates/del_user.ldif ",
+        "content": "dn: $dn\r\nchangetype: delete",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": "/home/engines/templates/rm_email_from_email_group.ldif",
+        "content": "dn: cn=$email_group,ou=Distribution Groups,dc=engines,dc=internal\r\nchangetype: modify\r\ndelete:  memberUid\r\nmemberUid: $email_address",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": "/home/engines/templates/rm_email_group.ldif",
+        "content": "dn: cn=$group_name,ou=Distribution Groups,dc=engines,dc=internal\r\nchangetype: delete\r\n",
+        "user": "root",
+        "group": "root",
+        "permissions": "222"
+      },
+      {
+        "path": "/home/engines/templates/rm_user_from_group.ldif ",
+        "content": "dn: cn=$group_name,ou=Groups,dc=engines,dc=internal\r\nchangetype: modify\r\ndelete:  memberUid\r\nmemberUid: $uid",
         "user": "root",
         "group": "root",
         "permissions": "222"
@@ -167,7 +230,7 @@
         ],
         "script": {
           "language": "sh",
-          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n. /home/engines/functions/ldap/support_functions.sh\r\nrequired_values=\"uid password last_name given_name domain_name\"\r\ncheck_required_values \r\n\r\n# Fills is the $variables\r\ncat /home/engines/templates/add_user.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\nuidnumber=`/home/engines/scripts/ldap/next_uid.sh`\r\n\r\n#Adds uidnumber to ldif\r\necho uidnumber:$uidnumber >> $LDIF_FILE\r\nerr_file=`mktemp`\r\n#send Ldif to ldap\r\nr=`cat $LDIF_FILE | /home/engines/scripts/ldap/ldapadd.sh` \r\nif test $? -eq 0\r\n then\r\n  #create kerberos\r\n  echo \"addprinc -pw $password  $uid\" | sudo -n /home/engines/scripts/actionators/sudo/_add_kerberos_princ.sh &> $err_file\r\nfi   \r\ne=$?\r\nif test $e -eq 0\r\n then\r\n   echo $r\r\n else\r\n   echo '{\"uid\":\"'$uid'\"}' | /home/engines/scripts/actionators/del_user.sh   \r\n    mesg=`cat $err_file`\r\n   echo '{\"Error\":\"failed to add k user\",\"Result\":\"Failed\",\"exit\":\"'$e',\"mesg\":\"'$mesg'\"}'   \r\n fi\r\n \r\n#FIX ME Add user to Users Group or $default_group\r\n  \r\nrm  $err_file\r\n   "
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n. /home/engines/functions/ldap/support_functions.sh\r\nrequired_values=\"uid password last_name given_name domain_name\"\r\ncheck_required_values \r\n\r\n# Fills is the $variables\r\ncat /home/engines/templates/add_user.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\nuidnumber=`/home/engines/scripts/ldap/next_uid.sh`\r\n\r\n#Adds uidnumber to ldif\r\necho uidnumber:$uidnumber >> $LDIF_FILE\r\n\r\nerr_file=`mktemp`\r\n#send Ldif to ldap\r\nr=`cat $LDIF_FILE | /home/engines/scripts/ldap/ldapadd.sh` \r\nif test $? -eq 0\r\n then\r\n  #create kerberos\r\n  echo \"addprinc -pw $password  $uid\" | sudo -n /home/engines/scripts/actionators/sudo/_add_kerberos_princ.sh &> $err_file\r\nfi   \r\ne=$?\r\nif test $e -eq 0\r\n then\r\n   echo $r\r\n else\r\n   echo '{\"uid\":\"'$uid'\"}' | /home/engines/scripts/actionators/del_user.sh   \r\n    mesg=`cat $err_file`\r\n   echo '{\"Error\":\"failed to add k user\",\"Result\":\"Failed\",\"exit\":\"'$e',\"mesg\":\"'$mesg'\"}'   \r\n fi\r\n \r\n#FIX ME Add user to Users Group or $default_group\r\n  \r\nrm  $err_file\r\n   "
         }
       },
       {
