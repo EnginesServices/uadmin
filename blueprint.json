@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-12-24T13:31:45+11:00"
+    "timestamp": "2017-12-24T13:41:08+11:00"
   },
   "software": {
     "base": {
@@ -255,7 +255,11 @@
               "comment": "first_initialLast_Name as in jdoe"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nrequired_values=\"uid\"\r\ncheck_required_values \r\n. /home/engines/functions/ldap/support_functions.sh\r\n\r\ndn=`/home/engines/scripts/ldap/get_dn.sh  ou=People,dc=engines,dc=internal uid=$uid`\r\n\r\ncat /home/engines/templates/del_user.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\n\r\nr=`cat $LDIF_FILE | /home/engines/scripts/ldap/ldapmodify.sh` \r\nif test $? -eq 0\r\n then\r\n  echo \"delprinc -force  $uid\" | sudo -n /home/engines/scripts/actionators/sudo/_add_kerberos_princ.sh\r\nfi   \r\ne=$?\r\nif test $e -eq 0\r\n then\r\n   echo $r\r\n else\r\n   echo '{\"Error\":\"failed to del k user\",\"Result\":\"Failed\",\"exit\":\"'$e'\"}'   \r\n fi\r\n   \r\n"
+        }
       },
       {
         "name": "list_group_members",
@@ -270,12 +274,20 @@
               "label": "Group Name"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\nif test -z $group_name\r\n then\r\n  echo '{\"error\":\"No Group Name specified\"}'\r\n  exit 127\r\nfi\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=Groups,dc=engines,dc=internal\" cn=$group_name memberUid > $LDAP_FILE \r\n\r\necho '{\"members\":'\r\nkey=memberUid\r\nmap_ldap_to_json_array\r\necho '}'"
+        }
       },
       {
         "name": "list_groups",
         "label": "List Groups",
-        "return_type": "json"
+        "return_type": "json",
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=Groups,dc=engines,dc=internal\" objectClass=posixGroup cn gidNumber > $LDAP_FILE\r\n\r\necho '{\"groups\":'\r\nldap_to_json_array\r\necho '}'"
+        }
       },
       {
         "name": "list_user_email_adresses",
@@ -290,7 +302,11 @@
               "label": "User id"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\nif test -z $uid\r\n then\r\n  echo '{\"error\":\"No uid specified\"}'\r\n  exit 127\r\nfi\r\n\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=People,dc=engines,dc=internal\" uid=$uid mailacceptinggeneralid  > $LDAP_FILE\r\n\r\necho '{\"email_addresses\":'\r\nkey=mailacceptinggeneralid\r\nmap_ldap_to_json_array\r\necho '}'\r\n\r\n\r\n\r\n "
+        }
       },
       {
         "name": "list_users",
@@ -314,7 +330,11 @@
               "title": "User Id"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nrequired_values=\"uid\"\r\ncheck_required_values \r\n. /home/engines/functions/ldap/support_functions.sh"
+        }
       },
       {
         "name": "rm_email_address_from_user",
@@ -337,7 +357,11 @@
               "title": "Email Address"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nrequired_values=\"uid email_address\"\r\ncheck_required_values \r\n\r\ndn=`/home/engines/scripts/ldap/get_dn.sh  ou=People,dc=engines,dc=internal uid=$uid`\r\n\r\n. /home/engines/functions/ldap/support_functions.sh\r\n\r\ncat /home/engines/templates/del_user_email.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\n\r\ncat $LDIF_FILE | /home/engines/scripts/ldap/ldapmodify.sh \r\n"
+        }
       },
       {
         "name": "rm_user_from_group",
@@ -360,7 +384,11 @@
               "title": "Group Name"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nrequired_values=\"uid group_name\"\r\ncheck_required_values \r\n\r\n. /home/engines/functions/ldap/support_functions.sh\r\n\r\ncat /home/engines/templates/rm_user_from_group.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\n\r\ncat $LDIF_FILE | /home/engines/scripts/ldap/ldapmodify.sh"
+        }
       },
       {
         "name": "user_details",
@@ -375,7 +403,11 @@
               "label": "Username"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\nif test -z $uid\r\n then\r\n  echo '{\"error\":\"No ui specified\"}'\r\n  exit 127\r\nfi\r\n\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=People,dc=engines,dc=internal\" uid=$uid > $LDAP_FILE\r\n\r\necho '{\"user\":'\r\nldap_to_json\r\necho '}'\r\n "
+        }
       },
       {
         "name": "group_details",
@@ -388,7 +420,11 @@
               "label": "Group name"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\n. /home/engines/functions/ldap/support_functions.sh\r\n\r\nif test -z $group_name\r\n then\r\n  echo '{\"error\":\"No Group Name specified\"}'\r\n  exit 127\r\nfi\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"cn=$group_name,ou=Groups,dc=engines,dc=internal\" objectClass=posixGroup > $LDAP_FILE \r\n\r\necho '{\"group\":'\r\nldap_to_json\r\necho '}'"
+        }
       },
       {
         "name": "user_group_membership",
@@ -403,7 +439,11 @@
               "label": "User id"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\nif test -z $uid\r\n then\r\n  echo '{\"error\":\"No ui specified\"}'\r\n  exit 127\r\nfi\r\n\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=Groups,dc=engines,dc=internal\" memberUid=$uid cn > $LDAP_FILE\r\n\r\n\r\necho '{\"groups\":'\r\nkey=cn\r\nmap_ldap_to_json_array\r\necho '}'"
+        }
       },
       {
         "name": "change_user_password",
@@ -435,13 +475,18 @@
           }
         ],
         "script": {
-          "language": "sh"
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nrequired_values=\"uid password\"\r\ncheck_required_values \r\n\r\n. /home/engines/functions/ldap/support_functions.sh\r\n err_file=`mktemp`\r\n echo \"cpw -pw $password  $uid\" | sudo -n /home/engines/scripts/actionators/sudo/_add_kerberos_princ.sh >& $err_file\r\n r=$?\r\n if test $r -eq 0\r\n then\r\n   echo '{\"Result\":\"OK\",\"Code\":\"200\"}'\r\n else\r\n   err=`cat $err_file`\r\n   echo '{\"Error\":\"failed to change user\",\"Result\":\"Failed $err\",\"exit\":\"'$r'\"}'   \r\n fi\r\n rm $err_file\r\n"
         }
       },
       {
         "name": "list_email_groups",
         "label": "List email groups",
-        "return_type": "json"
+        "return_type": "json",
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n#. /home/engines/functions/params_to_env.sh\r\n#params_to_env\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=Distribution Groups,dc=engines,dc=internal\"  objectClass=posixGroup > $LDAP_FILE\r\n\r\n\r\necho '{\"groups\":'\r\nldap_to_json_array\r\necho '}'\r\n\r\n\r\n"
+        }
       },
       {
         "name": "list_email_group_members",
@@ -455,7 +500,11 @@
               "type": "string"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nif test -z $email_group\r\n then\r\n  echo '{\"Result\":\"FAILED\",\"ErrorMesg\":\"Missing Group name\"}'\r\n  exit 127\r\nfi\r\n \r\n \r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=Distribution Groups,dc=engines,dc=internal\" cn=$email_group memberUid > $LDAP_FILE\r\n\r\n\r\necho '{\"email_addresses\":'\r\nkey=memberUid\r\nmap_ldap_to_json_array\r\necho '}'"
+        }
       },
       {
         "name": "create_email_group",
@@ -478,7 +527,11 @@
               "type": "string"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nrequired_values=\"email_group\"\r\ncheck_required_values \r\n \r\n . /home/engines/functions/ldap/support_functions.sh\r\n\r\ngidNumber=`/home/engines/scripts/ldap/next_gid.sh`\r\ncat /home/engines/templates/add_email_group.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\n\r\n\r\n\r\ncat $LDIF_FILE | /home/engines/scripts/ldap/ldapadd.sh "
+        }
       },
       {
         "name": "add_email_to_email_group",
@@ -500,7 +553,11 @@
               "label": "Email address"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\nrequired_values=\"email_address email_group\"\r\ncheck_required_values \r\n \r\n. /home/engines/functions/ldap/support_functions.sh\r\n\r\ncat /home/engines/templates/add_email_to_email_group.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\n\r\ncat $LDIF_FILE | /home/engines/scripts/ldap/ldapmodify.sh  "
+        }
       },
       {
         "name": "rm_email_group",
@@ -515,7 +572,11 @@
               "label": "Email group address"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nrequired_values=\"group_name\"\r\ncheck_required_values \r\n\r\n. /home/engines/functions/ldap/support_functions.sh\r\n\r\ncat /home/engines/templates/rm_email_group.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\n\r\ncat $LDIF_FILE | /home/engines/scripts/ldap/ldapmodify.sh \r\n"
+        }
       },
       {
         "name": "rm_email_from_email_group",
@@ -539,22 +600,38 @@
               "label": "Email address"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\nrequired_values=\"email_group email_address\"\r\ncheck_required_values \r\n\r\n. /home/engines/functions/ldap/support_functions.sh\r\n\r\ncat /home/engines/templates/rm_email_from_email_group.ldif | while read LINE\r\ndo\r\n eval echo $LINE >> $LDIF_FILE\r\ndone\r\n\r\n\r\ncat $LDIF_FILE | /home/engines/scripts/ldap/ldapmodify.sh"
+        }
       },
       {
         "name": "all_user_names",
         "label": "All user ids",
-        "return_type": "json"
+        "return_type": "json",
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=People,dc=engines,dc=internal\"  objectClass=posixAccount uid > $LDAP_FILE\r\n\r\necho '{\"user_ids\":'\r\nkey=uid\r\nmap_ldap_to_json_array\r\necho '}'"
+        }
       },
       {
         "name": "all_email_adresses",
         "label": "All email addresses",
-        "return_type": "json"
+        "return_type": "json",
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=People,dc=engines,dc=internal\"  objectClass=posixAccount mailacceptinggeneralid > $LDAP_FILE\r\n\r\necho '{\"email_adresses\":{\"user_adresses\":'\r\n\r\nkey=mailacceptinggeneralid\r\nmap_ldap_to_json_array\r\necho ',\"group_adresses\":'\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=Distribution Groups,dc=engines,dc=internal\"  objectClass=posixGroup cn > $LDAP_FILE\r\nkey=cn\r\nmap_ldap_to_json_array\r\necho '}}'"
+        }
       },
       {
         "name": "all_group_names",
         "label": "List all group names",
-        "return_type": "json"
+        "return_type": "json",
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=Groups,dc=engines,dc=internal\"  objectClass=posixGroup cn > $LDAP_FILE\r\n\r\necho '{\"user_ids\":'\r\nkey=cn\r\nmap_ldap_to_json_array\r\necho '}'"
+        }
       },
       {
         "name": "whose_email",
@@ -569,7 +646,11 @@
               "label": "Email address"
             }
           }
-        ]
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\nif test -z $email_address\r\n then\r\n  echo '{\"error\":\"No email_address specified\"}'\r\n  exit 127\r\nfi\r\n\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=People,dc=engines,dc=internal\" mailacceptinggeneralid=$email_address uid> $LDAP_FILE\r\n\r\necho '{\"user\":'\r\nldap_to_json\r\necho '}'"
+        }
       }
     ]
   }
