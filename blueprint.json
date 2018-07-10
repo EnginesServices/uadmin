@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2017-12-24T13:41:08+11:00"
+    "timestamp": "2018-07-10T14:41:07+10:00"
   },
   "software": {
     "base": {
@@ -32,6 +32,8 @@
       "service_handle_field": "na",
       "parent_image": "engines/servicebase",
       "deployment_type": "worker",
+      "default_stop_timeout": 0,
+      "restart_attempts": 0,
       "memory": {
         "required": 64,
         "recommended": 64
@@ -650,6 +652,41 @@
         "script": {
           "language": "sh",
           "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\nif test -z $email_address\r\n then\r\n  echo '{\"error\":\"No email_address specified\"}'\r\n  exit 127\r\nfi\r\n\r\n. /home/engines/scripts/actionators/x400_to_json.sh\r\n\r\n/home/engines/scripts/ldap/ldapsearch.sh \"ou=People,dc=engines,dc=internal\" mailacceptinggeneralid=$email_address uid> $LDAP_FILE\r\n\r\necho '{\"user\":'\r\nldap_to_json\r\necho '}'"
+        }
+      },
+      {
+        "name": "which_branch",
+        "label": "Branch",
+        "return_type": "plain_text",
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/sh\r\ngit branch | grep \\* | cut -d ' ' -f2\r\nexit 0"
+        }
+      },
+      {
+        "name": "set_branch",
+        "label": "Set Branch",
+        "return_type": "plain_text",
+        "variables": [
+          {
+            "name": "branch",
+            "mandatory": true,
+            "input": {
+              "type": "select_with_input",
+              "label": "Branch",
+              "collection": {
+                "items": {
+                  "master": "master",
+                  "current": "current",
+                  "production": "production"
+                }
+              }
+            }
+          }
+        ],
+        "script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n. /home/engines/functions/params_to_env.sh\r\nparams_to_env\r\n\r\nrequired_values=\"release\"\r\ncheck_required_values \r\n\r\nif test $release = `git branch | grep \\* | cut -d ' ' -f2`\r\n then\r\n  echo \"Already release $release\"\r\n  exit 0\r\nfi\r\n\r\ngit checkout -b $branch \r\ngit pull\t\r\n\r\necho installing Gems\r\nbundle install --standalone  \r\nkill -TERM `cat /home/engines/run/uadmin.pid`"
         }
       }
     ]
