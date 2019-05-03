@@ -22,7 +22,7 @@
         "label": "User Admin"
       }
     },
-    "timestamp": "2018-07-10T14:41:07+10:00"
+    "timestamp": "2019-05-03T13:43:13+10:00"
   },
   "software": {
     "base": {
@@ -292,7 +292,7 @@
         }
       },
       {
-        "name": "list_user_email_adresses",
+        "name": "list_user_email_addresses",
         "label": "List Email address for user",
         "return_type": "json",
         "variables": [
